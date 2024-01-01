@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllData, increment, resetHomeState } from "../app/slices/fetchNotesSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Markdown from 'react-markdown'
 
 export default function ListNotes(){
     
@@ -72,11 +73,13 @@ export default function ListNotes(){
                                     <div key={index} onClick={()=>{
                                         navigate(`/note/${val.note_id}`)
                                     }} className="border rounded-lg overflow-hidden shadow-md">
-                                        <div className="h-20 border-t p-3 bg-[#F2F2F2] text-slate-500 text-sm">
+                                        <p className="h-40 border-t p-3 bg-[#F8F8F8] text-slate-500 text-sm overflow-clip text-balance break-words hyphens-auto">
+                                            <Markdown>
                                             {val.note_content}
-                                        </div>
+                                            </Markdown>
+                                        </p>
                                         <div className="border-t p-3">
-                                            <p className="overflow-hidden text-ellipsis font-semibold">{val.title}</p>
+                                            <p className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap">{val.title}</p>
                                             <p className="text-xs text-slate-400">Last Modified: {updatedDate.toLocaleDateString('en-IN', dateOptions)} - {updatedDate.toLocaleTimeString([], timeOptions)}</p>
                                         </div>
                                         <div className="border-t px-3 py-1 bg-[#444]">
