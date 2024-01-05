@@ -2,12 +2,21 @@ import { useEffect, useState } from "react";
 import LeftPane from "../components/leftpane";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { getCookie } from "../misc/CookieManager";
+import AuthCheck from "../components/Auth";
 
 export default function Bin(){
     const [data, setData] = useState([])
+    const [user, setUser] = useState({});
+
+    const session_token = getCookie("sid_app");
 
     useEffect(()=>{
-        axios.get(`${process.env.REACT_APP_BACKEND_HOST}/read/all-deleted`).then((res)=>{
+        axios.get(`${process.env.REACT_APP_BACKEND_HOST}/read/all-deleted`, {
+            headers: {
+                "Authorization": `Bearer ${session_token}`,
+            }   
+        }).then((res)=>{
             setData(res.data.data);
         }).catch((err)=>{
             console.log(err.response)
@@ -30,17 +39,28 @@ export default function Bin(){
     function restore(id){
         axios.put(`${process.env.REACT_APP_BACKEND_HOST}/restore/note`,{
             "note_id": id
+        }, {
+            headers: {
+                "Authorization": `Bearer ${session_token}`,
+            }   
         }).then((res)=>{
             alert("Restored");
+            window.location.reload();
             console.log(res.data.message);
         }).catch((err)=>{
             console.log(err);
         })
     }
 
+    function userInfo(data) {
+        setUser(data);
+        console.log(data);
+    }
+
     return (
         <div className="flex">
             <LeftPane bin={true}/>
+            <AuthCheck setUserInfo={userInfo}/>
             <div className="p-10 w-full h-screen">
                 <div className="flex gap-3 w-full justify-between">
                     <h1 className="font-[Helvetica] font-extrabold text-2xl text-[#333]">Bin</h1>
@@ -51,7 +71,7 @@ export default function Bin(){
                     data.map((val, index)=>{
                         var date = new Date(val.deletedAt);
                         return(
-                            <div>
+                            <div key={index}>
                                 <div className="flex my-1 justify-between">
                                     <div className="w-64 flex-shrink-0 p-3">
                                         <p className="overflow-hidden text-ellipsis font-semibold">{val.title}</p>

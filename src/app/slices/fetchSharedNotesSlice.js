@@ -2,12 +2,11 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios';
 import { getCookie } from '../../misc/CookieManager';
 
-
-export const fetchAllData = createAsyncThunk('data/fetchAllData', async (page, thunkAPI) => {
+export const fetchAllSharedData = createAsyncThunk('data/fetchAllSharedData', async (page, thunkAPI) => {
   var val = thunkAPI.getState().fetchData;
   if(val.previousOffset+1==page){
     try{
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/read/page?page=${page}`,{
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/read/shared/page?page=${page}`,{
       headers: {
           "Authorization": `Bearer ${getCookie("sid_app")}`,
         }   
@@ -28,7 +27,7 @@ const _initialState = {
   offset: 1
 };
 
-export const fetchData = createSlice({
+export const fetchSharedData = createSlice({
     name: 'fetchData',
     initialState: _initialState,
     reducers: {
@@ -43,16 +42,16 @@ export const fetchData = createSlice({
       }
     },
     extraReducers: (builder) => {
-      builder.addCase(fetchAllData.fulfilled, (state, action) => {
+      builder.addCase(fetchAllSharedData.fulfilled, (state, action) => {
         state.data = ([...state.data, ...action.payload.data.data]);
         state.nextpage = action.payload.data.nextpage;
         state.previousOffset +=1
       });
-      builder.addCase(fetchAllData.rejected, () => {
+      builder.addCase(fetchAllSharedData.rejected, () => {
         console.log("Failed");
       });;
     }
 })
 
-export const {increment, resetHomeState} = fetchData.actions;
-export default fetchData.reducer;
+export const {increment, resetHomeState} = fetchSharedData.actions;
+export default fetchSharedData.reducer;
