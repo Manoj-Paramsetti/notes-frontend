@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../misc/CookieManager";
 import AuthCheck from "../components/Auth";
+import { dataRequestErrorHandler } from "../misc/DataRequestHandler";
 
 export default function Bin(){
     const [data, setData] = useState([])
@@ -19,7 +20,7 @@ export default function Bin(){
         }).then((res)=>{
             setData(res.data.data);
         }).catch((err)=>{
-            console.log(err.response)
+            dataRequestErrorHandler(err);
         });
     }, []);
 
@@ -48,7 +49,7 @@ export default function Bin(){
             window.location.reload();
             console.log(res.data.message);
         }).catch((err)=>{
-            console.log(err);
+            dataRequestErrorHandler(err);
         })
     }
 

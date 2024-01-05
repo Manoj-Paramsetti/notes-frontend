@@ -7,6 +7,7 @@ import axios from "axios";
 import Markdown from 'react-markdown'
 import { getCookie } from "../misc/CookieManager";
 import AuthCheck from "../components/Auth";
+import { dataRequestErrorHandler } from "../misc/DataRequestHandler";
 
 export default function ListNotes(){
     
@@ -52,10 +53,7 @@ export default function ListNotes(){
             }).then((res)=>{
                 navigate(`/note/${res.data.note_id}`);
             }).catch((err)=>{
-                if(err.response.status===401){
-                    alert("Session Expired");
-                    window.location = "/login";
-                }
+                dataRequestErrorHandler(err);
             });
         }
     }

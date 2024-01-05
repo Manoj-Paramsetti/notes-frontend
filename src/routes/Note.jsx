@@ -5,6 +5,9 @@ import axios from 'axios';
 import Markdown from 'react-markdown';
 import { getCookie } from '../misc/CookieManager';
 import AuthCheck from '../components/Auth';
+import { dataRequestErrorHandler, pageErrorHandler } from '../misc/DataRequestHandler';
+
+
 export default function Note(){
     const { id } = useParams();  
     const [data, setData]  = useState({});
@@ -27,6 +30,10 @@ export default function Note(){
             return
         }
 
+        readNote();
+    },[id]);
+
+    function readNote() {
         axios.get(`${process.env.REACT_APP_BACKEND_HOST}/read/id/${id}`,{
             headers: {
                 "Authorization": `Bearer ${session_token}`,
@@ -37,12 +44,10 @@ export default function Note(){
             setTitle(res.data.title);
             setContent(res.data.note_content);
         }).catch((err)=>{
-            if(err.response.status===404) {
-                window.location = '/404';
-            }
-            console.log(err.response);
+            console.log(err);
+            pageErrorHandler(err);
         });
-    },[id]);
+    }
 
     function deleteNote() {
         const user_res = window.confirm("Do you want to really delete this file?");
@@ -55,7 +60,7 @@ export default function Note(){
                 console.log(res);
                 window.location = '/';
             }).catch((err)=>{
-                console.log(err.response);
+                dataRequestErrorHandler(err);
             })
         }
     }
@@ -76,8 +81,7 @@ export default function Note(){
             new_data["note_content"] = content
             setData(new_data)
         }).catch((err)=>{
-            alert("Something went wrongs");
-            console.error(err.response);
+            dataRequestErrorHandler(err);
         })
     }
     
@@ -95,8 +99,7 @@ export default function Note(){
             new_data["title"] = title
             setData(new_data)
         }).catch((err)=>{
-            alert("Something went wrongs");
-            console.error(err.response);
+            dataRequestErrorHandler(err);
         });
     }
     
@@ -114,8 +117,7 @@ export default function Note(){
             new_data["note_content"] = content
             setData(new_data)
         }).catch((err)=>{
-            alert("Something went wrongs");
-            console.error(err.response);
+          dataRequestErrorHandler(err);
         });
     }
     
@@ -137,12 +139,11 @@ export default function Note(){
 
     function userInfo(data) {
         setUser(data);
-        console.log(data);
     }
     
     return (
         <div className="flex">
-            { showModal && <ShareModal close={()=>{setShowModal(false)}} owner={data.owner} current_user={data.current_user} />}
+            { showModal && <ShareModal close={()=>{setShowModal(false)}} owner={data.owner} current_user={data.current_user} access_type={data.access_type} />}
             <LeftPane/>
             <AuthCheck setUserInfo={userInfo}/>
             <div className="p-10 w-full h-screen">
@@ -173,12 +174,15 @@ export default function Note(){
                         }
 
                     </button>
-                    <button onClick={saveHandler} className="w-[100px] flex gap-2 bg-black p-2 rounded-lg text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                        </svg>
-                        Save
-                    </button>
+                    {
+                        (data.access_type === "O" || data.access_type === "W") &&
+                        <button onClick={saveHandler} className="w-[100px] flex gap-2 bg-black p-2 rounded-lg text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                            </svg>
+                            Save
+                        </button>
+                    }
                     {
                         user.user_id === data.owner && <button 
                             onClick={deleteNote} 
@@ -219,7 +223,7 @@ export default function Note(){
 }
 
 
-function ShareModal({close, owner, current_user}){
+function ShareModal({close, owner, current_user, access_type}){
     const { id } = useParams();  
     const [data, setData]  = useState([]);
 
@@ -231,11 +235,10 @@ function ShareModal({close, owner, current_user}){
                     'Authorization': `Bearer ${session_token}`
                 }
             }).then((res)=>{
-                console.log(res.data.data);
                 setData(res.data.data);
             }
             ).catch((err)=>{
-                console.log(err.response);
+                dataRequestErrorHandler(err);
             })
 
         },[]    
@@ -252,19 +255,49 @@ function ShareModal({close, owner, current_user}){
             headers: {
                 'Authorization': `Bearer ${session_token}`
             }
-        }).then((res)=>{
-            console.log(res);
+        }).then(()=>{
+            alert("Shared!");
+            close();
         }).catch((err)=>{
-            console.log(err.response);
+            dataRequestErrorHandler(err);
         })
     }
+
+    function updateStatus(e) {
+        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/update/permission`, {
+            "note_id": id,
+            // "user_id": e.target.id,
+            "user_id": null,
+            // "access_type": e.target.value
+            "access_type": "R"
+        }, {
+            headers: {
+                'Authorization': `Bearer ${session_token}`
+            }
+        }).then(()=>{
+            alert("Updated!");
+            window.location.reload();
+        }).catch((err)=>{
+            dataRequestErrorHandler(err);
+        })
+    }
+
+    useEffect(()=>{
+        window.addEventListener('keydown', (e)=>{
+            if(e.key === "Escape"){
+                window.removeEventListener('keydown', (e)=>{});
+                close();
+            }
+        }
+        );
+    },[]);
 
     return <div onClick={(e)=>{
         if(e.target.id === "overlay"){
             close();
         }
     }} id="overlay" className='fixed flex top-0 bg-[#0007] w-screen h-screen z-10'>
-        <div className='bg-white h-min my-auto mx-auto p-4'>
+        <div className='bg-white h-min my-auto mx-auto p-4 rounded-lg'>
             <div className='flex gap-10 justify-between'>
                 Add Collaborator
                 <button onClick={close} className='text-black-500'>
@@ -296,19 +329,15 @@ function ShareModal({close, owner, current_user}){
                             </div>
                             <div className='my-auto text-xs text-slate-400'>
                                 {
-
                                     (item.access_type === 'O') && "Owner"
                                 }
                                 {   
                                     
-                                    (item.access_type !== 'O' && owner == current_user) && <select onChange={()=>{}} className='text-xs text-slate-400 outline-none active:outline-none hover:outline-none'>
-                                        <option value={'W'}>Edit</option>
+                                    (item.access_type !== 'O' && item.user_id !== current_user && access_type === 'O') ? <select id={item.user_id} onChange={updateStatus} className='text-xs text-slate-400 outline-none active:outline-none hover:outline-none'>
+                                        <option disabled={ !(access_type === 'O') } value={'W'}>Edit</option>
                                         <option value={'R'}>Read</option>
                                         <option value={'D'}>Remove</option>
-                                    </select>
-                                }
-                                {
-                                    (item.access_type !== 'O' && owner !== current_user) && <span className='text-xs text-slate-400'>{
+                                    </select> : <span className='text-xs text-slate-400'>{
                                         (item.access_type === 'W') && "Edit"
                                     }
                                     {
@@ -322,16 +351,16 @@ function ShareModal({close, owner, current_user}){
                 }
             </div>
             {
-                (owner == current_user) && <form onSubmit={shareFile} className='flex flex-col my-2'>
-                <div className="flex border px-2">
+                (access_type == "O") && <form onSubmit={shareFile} className='flex flex-col my-2'>
+                <hr className='mb-2 border-[#FFF]'/>
+                <div className="flex border px-2 rounded-lg">
                     <input type='email' required className="w-full p-2 my-1 outline-none active:outline-none hover:outline-none" placeholder='email'/>
                     <select required className='w-24 p-2 my-1 text-sm text-slate-700 outline-none active:outline-none hover:outline-none'>
                         <option value={'W'}>Edit</option>
                         <option value={'R'}>Read</option>
                     </select>
-
                 </div>
-                <button className='w-full p-2 my-1 border text-white bg-black'>
+                <button className='w-full p-2 mt-4 mb-1 border text-white bg-black rounded-lg'>
                     Share
                 </button>
             </form>

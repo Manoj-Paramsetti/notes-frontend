@@ -1,4 +1,5 @@
 import axios from "axios"
+import { dataRequestErrorHandler } from "../misc/DataRequestHandler";
 
 export default function LoginPage() {
 
@@ -7,7 +8,7 @@ export default function LoginPage() {
         axios.get(`${process.env.REACT_APP_BACKEND_HOST}/auth/bitbucket`).then((res)=>{
             window.location = res.data.uri;
         }).catch((err)=>{
-            console.log(err);
+            dataRequestErrorHandler(err);
         });
     }
 

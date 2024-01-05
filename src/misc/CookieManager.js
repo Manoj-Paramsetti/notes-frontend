@@ -1,6 +1,6 @@
 export function setCookie(key, value) {
     const date = new Date();
-    date.setTime(date.getTime() + 43200000);
+    date.setTime(date.getTime() + 86400000);
     document.cookie = key + "=" + value + "; expires=" + date.toUTCString() + "; path=/";
 }
 export function getCookie(name) {

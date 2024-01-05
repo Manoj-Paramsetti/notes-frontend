@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import LeftPane from "../components/leftpane";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import Markdown from 'react-markdown'
-import { getCookie } from "../misc/CookieManager";
+import Markdown from 'react-markdown';
 import { fetchAllSharedData, increment, resetHomeState } from "../app/slices/fetchSharedNotesSlice";
 import AuthCheck from "../components/Auth";
 
@@ -13,14 +11,13 @@ export default function SharedNotes(){
     const _data = useSelector((state) => state.fetchSharedData.data);
     const nextPage = useSelector((state) => state.fetchSharedData.nextpage);
     const offset = useSelector((state) => state.fetchSharedData.offset);
-    const [user, setUser] = useState({});
     
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(()=>{
         dispatch(resetHomeState());
-    },[]);
+    },[dispatch]);
 
     useEffect(
         ()=>{
@@ -39,35 +36,10 @@ export default function SharedNotes(){
         minute: '2-digit'
     }
 
-    function newNote(){
-        const user_res = window.prompt("Name of your new note?");
-        if(user_res!==""){
-            axios.post(`${process.env.REACT_APP_BACKEND_HOST}/create/note`,{
-                "title": user_res
-            }, {
-                headers: {
-                    "Authorization": `Bearer ${getCookie("sid_app")}`,
-                }   
-            }).then((res)=>{
-                navigate(`/note/${res.data.note_id}`);
-            }).catch((err)=>{
-                if(err.response.status===401){
-                    alert("Session Expired");
-                    window.location = "/login";
-                }
-            });
-        }
-    }
-
-    function userInfo(data) {
-        setUser(data);
-        console.log(data);
-    }
-
     return (
         <div className="flex">
             <LeftPane shared={true}/>
-            <AuthCheck setUserInfo={userInfo}/>
+            <AuthCheck/>
             <div className="p-10 w-full">
                 <div className="flex w-full justify-between">
                     <h1 className="font-[Helvetica] font-extrabold text-2xl text-[#333]">Shared</h1>

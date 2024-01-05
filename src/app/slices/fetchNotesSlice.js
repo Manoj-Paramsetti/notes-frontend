@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios';
 import { getCookie } from '../../misc/CookieManager';
+import { dataRequestErrorHandler } from '../../misc/DataRequestHandler';
 
 
 export const fetchAllData = createAsyncThunk('data/fetchAllData', async (page, thunkAPI) => {
@@ -15,6 +16,7 @@ export const fetchAllData = createAsyncThunk('data/fetchAllData', async (page, t
       return res
     }
     catch(err) {
+      dataRequestErrorHandler(err);
       return thunkAPI.rejectWithValue(err.response.data.message);
     }
   }
@@ -48,8 +50,8 @@ export const fetchData = createSlice({
         state.nextpage = action.payload.data.nextpage;
         state.previousOffset +=1
       });
-      builder.addCase(fetchAllData.rejected, () => {
-        console.log("Failed");
+      builder.addCase(fetchAllData.rejected, (state, action) => {
+        console.log(action.payload);
       });;
     }
 })

@@ -3,11 +3,28 @@ import { useEffect, useState } from "react"
 import { getCookie, setCookie } from "../misc/CookieManager";
 import { useDispatch } from "react-redux";
 import { pushData } from "../app/slices/userSlice";
+import { dataRequestErrorHandler } from "../misc/DataRequestHandler";
 
 export default function Authorize() {
     const [currentStage, setCurrentStage] = useState(0);
     const totalStage = 2;
 
+    function saveUserSessionDataInBrowser(data){
+        // Cookies for app session
+        setCookie("sid_app", data?.token);
+        setCookie("sid_expires_in", data?.expires_in);
+        // User info in Local Storage
+        localStorage.setItem('name', data?.user?.name);
+        localStorage.setItem('email', data?.user?.email);
+        localStorage.setItem('user_id', data?.user?.user_id);
+        localStorage.setItem('display_picture', data?.user?.display_picture);
+    }
+
+    function saveBitBucketCredentialsInBrowser(data){
+        setCookie("bb_access_token", data?.access_token);
+        setCookie("OAuth_Type", "bitbucket");
+        setCookie("bb_refresh_token", data?.refresh_token);
+    }
     async function getSessionToken(){
         try{
             const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/auth/bitbucket/session`, {
@@ -15,17 +32,7 @@ export default function Authorize() {
                     "Authorization": `Bearer ${getCookie("bb_access_token")}`,
                 }    
             })
-            setCookie("sid_app", res.data.token);
-            setCookie("sid_expires_in", res.data.expires_in);
-            const user = res.data.user;
-            // dispatch(pushData(user));
-
-            localStorage.setItem('name', res.data.user.name);
-            localStorage.setItem('email', res.data.user.email);
-            localStorage.setItem('user_id', res.data.user.user_id);
-            localStorage.setItem('display_picture', res.data.user.display_picture);
-            
-            
+            saveUserSessionDataInBrowser(res?.data);
             setCurrentStage(2);
             window.location = "/";
         }
@@ -33,19 +40,21 @@ export default function Authorize() {
             console.log(err);
         };
     }
-    
-    useEffect(()=>{
+
+    function callbackRequest() {
         axios.post(`${process.env.REACT_APP_BACKEND_HOST}/auth/bitbucket/callback`,{
             code: new URLSearchParams(window.location.search).get("code")
         }).then((res)=>{
-            setCookie("bb_access_token", res.data.access_token);
-            setCookie("OAuth_Type", "bitbucket");
-            setCookie("bb_refresh_token", res.data.refresh_token);
+            saveBitBucketCredentialsInBrowser(res.data);
             setCurrentStage(currentStage+1);
             getSessionToken();
         }).catch((err)=>{
-            console.log(err);
-        });    
+            dataRequestErrorHandler(err);
+        });
+    }
+    
+    useEffect(()=>{
+        callbackRequest();   
     },[]);
 
     return (
