@@ -5,7 +5,7 @@ export default function LoginPage() {
 
 
     function bitBucketRedirect(){
-        axios.get(`${process.env.REACT_APP_BACKEND_HOST}/auth/bitbucket`).then((res)=>{
+        axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/auth/bitbucket`).then((res)=>{
             window.location = res.data.uri;
         }).catch((err)=>{
             dataRequestErrorHandler(err);

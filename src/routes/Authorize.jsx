@@ -27,7 +27,7 @@ export default function Authorize() {
     }
     async function getSessionToken(){
         try{
-            const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/auth/bitbucket/session`, {
+            const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/auth/bitbucket/session`, {
                 headers: {
                     "Authorization": `Bearer ${getCookie("bb_access_token")}`,
                 }    
@@ -42,7 +42,7 @@ export default function Authorize() {
     }
 
     function callbackRequest() {
-        axios.post(`${process.env.REACT_APP_BACKEND_HOST}/auth/bitbucket/callback`,{
+        axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/auth/bitbucket/callback`,{
             code: new URLSearchParams(window.location.search).get("code")
         }).then((res)=>{
             saveBitBucketCredentialsInBrowser(res.data);

@@ -34,7 +34,7 @@ export default function Note(){
     },[id]);
 
     function readNote() {
-        axios.get(`${process.env.REACT_APP_BACKEND_HOST}/read/id/${id}`,{
+        axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/read/id/${id}`,{
             headers: {
                 "Authorization": `Bearer ${session_token}`,
             }
@@ -52,7 +52,7 @@ export default function Note(){
     function deleteNote() {
         const user_res = window.confirm("Do you want to really delete this file?");
         if(user_res) {
-            axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/delete/${id}`, {
+            axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/api/delete/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${session_token}`
                 }
@@ -66,7 +66,7 @@ export default function Note(){
     }
     
     function saveAll(){
-        axios.put(`${process.env.REACT_APP_BACKEND_HOST}/update/note`, {
+        axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api/update/note`, {
             "note_id": id,
             "note_title": title,
             "note_content": content
@@ -86,7 +86,7 @@ export default function Note(){
     }
     
     function saveTitle() {
-        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/update/title`, {
+        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/api/update/title`, {
             "note_id": id,
             "note_title": title,
         }, {
@@ -104,7 +104,7 @@ export default function Note(){
     }
     
     function saveContent() {
-        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/update/content`, {
+        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/api/update/content`, {
             "note_id": id,
             "note_content": content,
         }, {
@@ -230,7 +230,7 @@ function ShareModal({close, owner, current_user, access_type}){
     const session_token = getCookie("sid_app");
     useEffect(
         ()=>{
-            axios.get(`${process.env.REACT_APP_BACKEND_HOST}/read/acl/${id}`,{
+            axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/read/acl/${id}`,{
                 headers: {
                     'Authorization': `Bearer ${session_token}`
                 }
@@ -247,7 +247,7 @@ function ShareModal({close, owner, current_user, access_type}){
         e.preventDefault();
         console.log(e.target[0].value);
         console.log(e.target[1].value);
-        axios.post(`${process.env.REACT_APP_BACKEND_HOST}/create/acl`, {
+        axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/create/acl`, {
             "note_id": id,
             "email": e.target[0].value,
             "access_type": e.target[1].value
@@ -264,12 +264,10 @@ function ShareModal({close, owner, current_user, access_type}){
     }
 
     function updateStatus(e) {
-        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/update/permission`, {
+        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/api/update/permission`, {
             "note_id": id,
-            // "user_id": e.target.id,
-            "user_id": null,
-            // "access_type": e.target.value
-            "access_type": "R"
+            "user_id": e.target.id,
+            "access_type": e.target.value
         }, {
             headers: {
                 'Authorization': `Bearer ${session_token}`
@@ -312,17 +310,17 @@ function ShareModal({close, owner, current_user, access_type}){
                     data?.map((item)=>{
                         return <div className='flex gap-2 p-2 border-b'>
                             {
-                                item.users[0].display_picture ? <img className='w-8 h-8 rounded-full' src={item.users[0].display_picture} alt={item.name}/>
+                                item.users.display_picture ? <img className='w-8 h-8 rounded-full' src={item.users.display_picture} alt={item.name}/>
                                 : <div className='w-8 h-8 text-xs rounded-full bg-black text-white flex justify-center items-center'>
                                     <p className='my-auto'>
-                                        {item.users[0].name[0]}{item.users[0].name.split(' ')[1][0] || ""}
+                                        {item.users.name[0]}{item.users.name.split(' ')[1][0] || ""}
                                     </p>
                                 </div>
                             }
                             
                             <div className='flex flex-col'>
-                                <span className='text-sm'>{item.users[0].name}</span>
-                                <span className='text-xs'>{item.users[0].email}</span>
+                                <span className='text-sm'>{item.users.name}</span>
+                                <span className='text-xs'>{item.users.email}</span>
                             </div>
                             <div className='flex-grow'>
 

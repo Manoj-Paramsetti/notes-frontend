@@ -7,7 +7,7 @@ export const fetchAllSharedData = createAsyncThunk('data/fetchAllSharedData', as
   var val = thunkAPI.getState().fetchData;
   if(val.previousOffset+1===page){
     try{
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/read/shared/page?page=${page}`,{
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/read/shared/page?page=${page}`,{
       headers: {
           "Authorization": `Bearer ${getCookie("sid_app")}`,
         }   
