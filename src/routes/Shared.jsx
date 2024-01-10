@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import LeftPane from "../components/leftpane";
+import LeftPane from "../components/leftpane.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Markdown from 'react-markdown';
 import { fetchAllSharedData, increment, resetHomeState } from "../app/slices/fetchSharedNotesSlice";
-import AuthCheck from "../components/Auth";
+import AuthCheck from "../components/Auth.jsx";
 
 export default function SharedNotes(){
     

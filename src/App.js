@@ -1,15 +1,15 @@
 import './App.css';
 import { Routes, Route} from 'react-router-dom';
-import ListNotes from './routes/ListNotes';
-import Note from './routes/Note';
-import Bin from './routes/Bin';
-import Page404 from './routes/404';
-import Login from './routes/Login';
-import Authorize from './routes/Authorize';
-import SharedNotes from './routes/Shared';
-import Page400 from './routes/400';
-import Page403 from './routes/403';
-import Page500 from './routes/500';
+import ListNotes from './routes/ListNotes.jsx';
+import Note from './routes/Note.jsx';
+import Bin from './routes/Bin.jsx';
+import Login from './routes/Login.jsx';
+import Authorize from './routes/Authorize.jsx';
+import SharedNotes from './routes/Shared.jsx';
+import Page400 from './routes/400.jsx';
+import Page403 from './routes/403.jsx';
+import Page404 from './routes/404.jsx';
+import Page500 from './routes/500.jsx';
 
 function App() {
   return (

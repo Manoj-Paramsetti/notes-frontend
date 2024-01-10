@@ -4,7 +4,7 @@ import axios from "axios";
 import { dataRequestErrorHandler } from "../misc/DataRequestHandler";
 
 function checkAuth(setUserInfo) {
-    axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/auth/check`, {
+    axios.get(`/api/auth/check`, {
         headers: {
             Authorization: `Bearer ${getCookie('sid_app')}`
         }

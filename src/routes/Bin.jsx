@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import LeftPane from "../components/leftpane";
+import LeftPane from "../components/leftpane.jsx";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "../misc/CookieManager";
-import AuthCheck from "../components/Auth";
+import AuthCheck from "../components/Auth.jsx";
 import { dataRequestErrorHandler } from "../misc/DataRequestHandler";
 
 export default function Bin(){
@@ -13,7 +13,7 @@ export default function Bin(){
     const session_token = getCookie("sid_app");
 
     useEffect(()=>{
-        axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/read/all-deleted`, {
+        axios.get(`/api/read/all-deleted`, {
             headers: {
                 "Authorization": `Bearer ${session_token}`,
             }   
@@ -38,7 +38,7 @@ export default function Bin(){
     }
 
     function restore(id){
-        axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api/restore/note`,{
+        axios.put(`/api/restore/note`,{
             "note_id": id
         }, {
             headers: {

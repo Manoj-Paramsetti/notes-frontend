@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import LeftPane from "../components/leftpane";
+import LeftPane from "../components/leftpane.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllData, increment, resetHomeState } from "../app/slices/fetchNotesSlice";
+import { fetchAllData, increment } from "../app/slices/fetchNotesSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Markdown from 'react-markdown'
 import { getCookie } from "../misc/CookieManager";
-import AuthCheck from "../components/Auth";
+import AuthCheck from "../components/Auth.jsx";
 import { dataRequestErrorHandler } from "../misc/DataRequestHandler";
 
 export default function ListNotes(){
@@ -45,7 +45,7 @@ export default function ListNotes(){
         const user_res = window.prompt("Name of your new note?");
         console.log(user_res);
         if(user_res!=="" && user_res!==null){
-            axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/create/note`,{
+            axios.post(`/api/create/note`,{
                 "title": user_res
             }, {
                 headers: {

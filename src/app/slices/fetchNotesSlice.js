@@ -8,7 +8,7 @@ export const fetchAllData = createAsyncThunk('data/fetchAllData', async (page, t
   var val = thunkAPI.getState().fetchData;
   if(val.previousOffset+1==page){
     try{
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/read/page?page=${page}`,{
+      const res = await axios.get(`/api/read/page?page=${page}`,{
       headers: {
           "Authorization": `Bearer ${getCookie("sid_app")}`,
         }   

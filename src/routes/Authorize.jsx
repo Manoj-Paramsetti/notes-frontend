@@ -1,13 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react"
 import { getCookie, setCookie } from "../misc/CookieManager";
-import { useDispatch } from "react-redux";
-import { pushData } from "../app/slices/userSlice";
 import { dataRequestErrorHandler } from "../misc/DataRequestHandler";
 
 export default function Authorize() {
     const [currentStage, setCurrentStage] = useState(0);
-    const totalStage = 2;
+    const totalStage = 2;;
 
     function saveUserSessionDataInBrowser(data){
         // Cookies for app session
@@ -27,7 +25,7 @@ export default function Authorize() {
     }
     async function getSessionToken(){
         try{
-            const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/auth/bitbucket/session`, {
+            const res = await axios.get(`/api/auth/bitbucket/session`, {
                 headers: {
                     "Authorization": `Bearer ${getCookie("bb_access_token")}`,
                 }    
@@ -42,7 +40,7 @@ export default function Authorize() {
     }
 
     function callbackRequest() {
-        axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/auth/bitbucket/callback`,{
+        axios.post(`/api/auth/bitbucket/callback`,{
             code: new URLSearchParams(window.location.search).get("code")
         }).then((res)=>{
             saveBitBucketCredentialsInBrowser(res.data);

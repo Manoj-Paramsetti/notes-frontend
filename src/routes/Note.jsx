@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'
-import LeftPane from '../components/leftpane';
+import LeftPane from '../components/leftpane.jsx';
 import axios from 'axios';
 import Markdown from 'react-markdown';
 import { getCookie } from '../misc/CookieManager';
-import AuthCheck from '../components/Auth';
+import AuthCheck from '../components/Auth.jsx';
 import { dataRequestErrorHandler, pageErrorHandler } from '../misc/DataRequestHandler';
 
 
@@ -34,7 +34,7 @@ export default function Note(){
     },[id]);
 
     function readNote() {
-        axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/read/id/${id}`,{
+        axios.get(`/api/read/id/${id}`,{
             headers: {
                 "Authorization": `Bearer ${session_token}`,
             }
@@ -52,7 +52,7 @@ export default function Note(){
     function deleteNote() {
         const user_res = window.confirm("Do you want to really delete this file?");
         if(user_res) {
-            axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/api/delete/${id}`, {
+            axios.delete(`/api/delete/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${session_token}`
                 }
@@ -66,7 +66,7 @@ export default function Note(){
     }
     
     function saveAll(){
-        axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api/update/note`, {
+        axios.put(`/api/update/note`, {
             "note_id": id,
             "note_title": title,
             "note_content": content
@@ -86,7 +86,7 @@ export default function Note(){
     }
     
     function saveTitle() {
-        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/api/update/title`, {
+        axios.patch(`/api/update/title`, {
             "note_id": id,
             "note_title": title,
         }, {
@@ -104,7 +104,7 @@ export default function Note(){
     }
     
     function saveContent() {
-        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/api/update/content`, {
+        axios.patch(`/api/update/content`, {
             "note_id": id,
             "note_content": content,
         }, {
@@ -230,7 +230,7 @@ function ShareModal({close, owner, current_user, access_type}){
     const session_token = getCookie("sid_app");
     useEffect(
         ()=>{
-            axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/read/acl/${id}`,{
+            axios.get(`/api/read/acl/${id}`,{
                 headers: {
                     'Authorization': `Bearer ${session_token}`
                 }
@@ -247,7 +247,7 @@ function ShareModal({close, owner, current_user, access_type}){
         e.preventDefault();
         console.log(e.target[0].value);
         console.log(e.target[1].value);
-        axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/create/acl`, {
+        axios.post(`/api/create/acl`, {
             "note_id": id,
             "email": e.target[0].value,
             "access_type": e.target[1].value
@@ -264,7 +264,7 @@ function ShareModal({close, owner, current_user, access_type}){
     }
 
     function updateStatus(e) {
-        axios.patch(`${process.env.REACT_APP_BACKEND_HOST}/api/update/permission`, {
+        axios.patch(`/api/update/permission`, {
             "note_id": id,
             "user_id": e.target.id,
             "access_type": e.target.value
