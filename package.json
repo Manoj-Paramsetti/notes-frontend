@@ -20,9 +20,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "REACT_APP_MODE=development react-scripts start",
     "build": "react-scripts build",
-    "dev": "webpack-dev-server --config webpack.dev.js --open",
+    "dev": "REACT_APP_MODE=development webpack-dev-server --config webpack.dev.js --open",
     "prod": "webpack --config webpack.prod.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
